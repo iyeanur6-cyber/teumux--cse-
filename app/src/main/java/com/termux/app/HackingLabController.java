@@ -15,9 +15,6 @@ import android.widget.Switch;
 import android.widget.Toast;
 import java.io.File;
 
-// টার্মাক্সের বিল্ট-ইন রিসোর্স প্যাকেজ ইম্পোর্ট করা হলো (এরর ফিক্স)
-import com.termux.R;
-
 public class HackingLabController {
 
     private final Context context;
@@ -32,7 +29,10 @@ public class HackingLabController {
     public void showFloatingWindow() {
         if (popupView != null) return;
 
-        popupView = LayoutInflater.from(context).inflate(R.layout.hacking_lab_popup, null);
+        int layoutId = context.getResources().getIdentifier("hacking_lab_popup", "layout", context.getPackageName());
+        if (layoutId == 0) return;
+
+        popupView = LayoutInflater.from(context).inflate(layoutId, null);
 
         int layoutFlag;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -58,59 +58,69 @@ public class HackingLabController {
     }
 
     private void setupComponents() {
-        Switch switchVpn = popupView.findViewById(R.id.switch_vpn);
-        Switch switchTor = popupView.findViewById(R.id.switch_tor);
-        Switch switchObfs4 = popupView.findViewById(R.id.switch_obfs4);
-        Button btnKillWipe = popupView.findViewById(R.id.btn_kill_wipe);
+        String resPackage = context.getPackageName();
+        int vpnId = context.getResources().getIdentifier("switch_vpn", "id", resPackage);
+        int torId = context.getResources().getIdentifier("switch_tor", "id", resPackage);
+        int obfs4Id = context.getResources().getIdentifier("switch_obfs4", "id", resPackage);
+        int killWipeId = context.getResources().getIdentifier("btn_kill_wipe", "id", resPackage);
 
-        // VPN এবং নেটওয়ার্ক ক্যাপচার কন্ট্রোল
-        switchVpn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Intent vpnIntent = new Intent(context, YIVpnService.class);
-                if (isChecked) {
-                    context.startService(vpnIntent);
-                    Toast.makeText(context, "YI VPN & Capture Engine Active", Toast.LENGTH_SHORT).show();
-                } else {
-                    context.stopService(vpnIntent);
-                    Toast.makeText(context, "VPN Engine Stopped", Toast.LENGTH_SHORT).show();
+        Switch switchVpn = popupView.findViewById(vpnId);
+        Switch switchTor = popupView.findViewById(torId);
+        Switch switchObfs4 = popupView.findViewById(obfs4Id);
+        Button btnKillWipe = popupView.findViewById(killWipeId);
+
+        if (switchVpn != null) {
+            switchVpn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Intent vpnIntent = new Intent(context, YIVpnService.class);
+                    if (isChecked) {
+                        context.startService(vpnIntent);
+                        Toast.makeText(context, "YI VPN & Capture Engine Active", Toast.LENGTH_SHORT).show();
+                    } else {
+                        context.stopService(vpnIntent);
+                        Toast.makeText(context, "VPN Engine Stopped", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }
 
-        // Tor টানেলিং কন্ট্রোল
-        switchTor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    executeTermuxCommand("start-tor");
-                    Toast.makeText(context, "Routing Traffic via Tor Network", Toast.LENGTH_SHORT).show();
-                } else {
-                    executeTermuxCommand("pkill -f tor");
-                    Toast.makeText(context, "Tor Disconnected", Toast.LENGTH_SHORT).show();
+        if (switchTor != null) {
+            switchTor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        executeTermuxCommand("start-tor");
+                        Toast.makeText(context, "Routing Traffic via Tor Network", Toast.LENGTH_SHORT).show();
+                    } else {
+                        executeTermuxCommand("pkill -f tor");
+                        Toast.makeText(context, "Tor Disconnected", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }
 
-        // Obfs4 Obfuscation কন্ট্রোল
-        switchObfs4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Toast.makeText(context, "Obfs4 Tunnelling Enabled", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(context, "Obfs4 Disabled", Toast.LENGTH_SHORT).show();
+        if (switchObfs4 != null) {
+            switchObfs4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        Toast.makeText(context, "Obfs4 Tunnelling Enabled", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "Obfs4 Disabled", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }
 
-        // এমার্জেন্সি কিল অ্যান্ড ওয়াইপ ল্যাব
-        btnKillWipe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                executeKillAndWipe();
-            }
-        });
+        if (btnKillWipe != null) {
+            btnKillWipe.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    executeKillAndWipe();
+                }
+            });
+        }
     }
 
     private void executeTermuxCommand(String command) {
@@ -123,11 +133,9 @@ public class HackingLabController {
 
     private void executeKillAndWipe() {
         Toast.makeText(context, "EMERGENCY ACTIVATED: Wiping Lab...", Toast.LENGTH_LONG).show();
-        
         try {
             String scriptPath = "/data/data/com.termux/files/home/kill_and_wipe.sh";
             File scriptFile = new File(scriptPath);
-
             if (scriptFile.exists()) {
                 Process process = Runtime.getRuntime().exec(new String[]{"/data/data/com.termux/files/usr/bin/bash", scriptPath});
                 process.waitFor();
@@ -135,10 +143,8 @@ public class HackingLabController {
                 File homeDir = new File("/data/data/com.termux/files/home");
                 deleteDirectory(homeDir);
             }
-
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(0);
-
         } catch (Exception e) {
             Toast.makeText(context, "Emergency Wipe Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
