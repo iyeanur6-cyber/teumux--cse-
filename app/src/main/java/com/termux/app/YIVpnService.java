@@ -69,17 +69,18 @@ public class YIVpnService extends VpnService implements Runnable {
         ByteBuffer buffer = ByteBuffer.allocate(32767);
 
         while (!Thread.interrupted()) {
-            int length = in.read(buffer.array());
-            if (length > 0) {
-                // এখানে প্যাকেট অ্যানালাইসিস লজিক যোগ করা যায় (Network Sniffing)
-                // packetData = analyzePacket(buffer, length); 
-                
-                // ট্রাফিককে ইন্টারনেটে পাস করা (বা টর প্রক্সিতে পাঠানো)
-                out.write(buffer.array(), 0, length);
-                buffer.clear();
-            }
-            Thread.sleep(10);
+    int length = in.read(buffer.array());
+    if (length > 0) {
+        
+        // নেটওয়ার্ক অ্যানালাইজার ক্লাস কল করা হলো
+        YINetworkAnalyzer.analyzePacket(buffer, length);
+        
+        out.write(buffer.array(), 0, length);
+        buffer.clear();
+    }
+    Thread.sleep(10);
         }
+        
     }
 
     private void closeInterface() {
