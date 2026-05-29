@@ -1,6 +1,7 @@
 package com.termux.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.view.Gravity;
@@ -58,39 +59,48 @@ public class HackingLabController {
         Switch switchObfs4 = popupView.findViewById(R.id.switch_obfs4);
         Button btnKillWipe = popupView.findViewById(R.id.btn_kill_wipe);
 
+        // VPN এবং নেটওয়ার্ক ক্যাপচার কন্ট্রোল
         switchVpn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Intent vpnIntent = new Intent(context, YIVpnService.class);
                 if (isChecked) {
-                    Toast.makeText(context, "Custom VPN Engine Starting...", Toast.LENGTH_SHORT).show();
+                    context.startService(vpnIntent);
+                    Toast.makeText(context, "YI VPN & Capture Engine Active", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(context, "VPN Stopped", Toast.LENGTH_SHORT).show();
+                    context.stopService(vpnIntent);
+                    Toast.makeText(context, "VPN Engine Stopped", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
+        // Tor টানেলিং কন্ট্রোল
         switchTor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    Toast.makeText(context, "Routing via Tor SOCKS5", Toast.LENGTH_SHORT).show();
+                    executeTermuxCommand("start-tor");
+                    Toast.makeText(context, "Routing Traffic via Tor Network", Toast.LENGTH_SHORT).show();
                 } else {
+                    executeTermuxCommand("pkill -f tor");
                     Toast.makeText(context, "Tor Disconnected", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
+        // Obfs4 Obfuscation কন্ট্রোল
         switchObfs4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    Toast.makeText(context, "Obfs4 Tunnelling Active", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Obfs4 Tunnelling Enabled", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(context, "Obfs4 Deactivated", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Obfs4 Disabled", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
+        // এমার্জেন্সি কিল অ্যান্ড ওয়াইপ ল্যাব
         btnKillWipe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,21 +109,34 @@ public class HackingLabController {
         });
     }
 
+    private void executeTermuxCommand(String command) {
+        try {
+            Runtime.getRuntime().exec(new String[]{"/data/data/com.termux/files/usr/bin/bash", "-c", command});
+        } catch (Exception e) {
+            Log.e("HackingLabCtrl", "Command Execution Failed: " + e.getMessage());
+        }
+    }
+
     private void executeKillAndWipe() {
-        Toast.makeText(context, "EMERGENCY: Wiping Termux Lab...", Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "EMERGENCY ACTIVATED: Wiping Lab...", Toast.LENGTH_LONG).show();
         
         try {
-            String termuxFilesPath = "/data/data/com.termux/files";
-            File homeDir = new File(termuxFilesPath + "/home");
-            File usrDir = new File(termuxFilesPath + "/usr");
+            String scriptPath = "/data/data/com.termux/files/home/kill_and_wipe.sh";
+            File scriptFile = new File(scriptPath);
 
-            deleteDirectory(homeDir);
-            
+            if (scriptFile.exists()) {
+                Process process = Runtime.getRuntime().exec(new String[]{"/data/data/com.termux/files/usr/bin/bash", scriptPath});
+                process.waitFor();
+            } else {
+                File homeDir = new File("/data/data/com.termux/files/home");
+                deleteDirectory(homeDir);
+            }
+
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(0);
 
         } catch (Exception e) {
-            Toast.makeText(context, "Wipe Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Emergency Wipe Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
