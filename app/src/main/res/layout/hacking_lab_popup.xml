@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="280dp"
+    android:layout_height="wrap_content"
+    android:background="#121212"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:backgroundTint="#1A1A1A">
+
+    <TextView
+        android:id="@+id/popup_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="YI HACKING LAB CONTROL"
+        android:textColor="#00FF00"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#333333"
+        android:layout_marginBottom="16dp"/>
+
+    <Switch
+        android:id="@+id/switch_vpn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Custom VPN &amp; Capture"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:thumbTint="#00FF00"
+        android:trackTint="#334433"
+        android:layout_marginBottom="12dp"/>
+
+    <Switch
+        android:id="@+id/switch_tor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tor Network (Anonymous)"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:thumbTint="#00FF00"
+        android:trackTint="#334433"
+        android:layout_marginBottom="12dp"/>
+
+    <Switch
+        android:id="@+id/switch_obfs4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Obfs4 Obfuscation"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:thumbTint="#00FF00"
+        android:trackTint="#334433"
+        android:layout_marginBottom="20dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#333333"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btn_kill_wipe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="KILL &amp; WIPE LAB"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:backgroundTint="#FF0000"
+        android:padding="12dp"/>
+
+</LinearLayout>
