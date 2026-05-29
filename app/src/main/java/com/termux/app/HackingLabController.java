@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,9 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 import java.io.File;
+
+// টার্মাক্সের বিল্ট-ইন রিসোর্স প্যাকেজ ইম্পোর্ট করা হলো (এরর ফিক্স)
+import com.termux.R;
 
 public class HackingLabController {
 
